@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
@@ -6,18 +6,11 @@ import playAlarm from "../utils/playAlarm";
 import { defaultSettings, useSettings } from "../context/SettingsContext";
 
 export default function SettingsForm({ handleClose }) {
-  const [settings, setSettings] = useState(defaultSettings);
   const [globalSettings, setGlobalSettings] = useSettings();
-
-  useEffect(() => {
-    const savedSettings = JSON.parse(localStorage.getItem("settings"));
-
-    if (savedSettings !== null) setSettings(savedSettings);
-  }, []);
+  const [settings, setSettings] = useState(globalSettings);
 
   function handleSubmit(e) {
     e.preventDefault();
-    localStorage.setItem("settings", JSON.stringify(settings));
     setGlobalSettings(settings);
     handleClose();
   }
@@ -40,11 +33,11 @@ export default function SettingsForm({ handleClose }) {
         <Form.Check
           className="mb-3"
           label="Browser notifications?"
-          checked={settings.notifications}
+          checked={settings.allowNotifications}
           onChange={(e) =>
             setSettings((prevSettings) => ({
               ...prevSettings,
-              notifications: !prevSettings.notifications,
+              allowNotifications: !prevSettings.allowNotifications,
             }))
           }
         />

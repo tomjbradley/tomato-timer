@@ -1,12 +1,14 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect } from "react";
+
+import useLocalStorage from "../hooks/useLocalStorage";
 
 export const defaultSettings = {
   timerInTitle: true,
-  notifications: true,
+  allowNotifications: true,
   autoStart: false,
   pomodoroGoal: 1,
   alarmSoundFilename: "alarmwatch.mp3",
-  volumePercentage: 0.5,
+  alarmVolume: 0.5,
   pomodoroMinutes: 25,
   shortBreakMinutes: 5,
   longBreakMinutes: 10,
@@ -19,7 +21,7 @@ export function useSettings() {
 }
 
 export function SettingsProvider({ children }) {
-  const [settings, setSettings] = useState(defaultSettings);
+  const [settings, setSettings] = useLocalStorage("settings", defaultSettings);
 
   return (
     <SettingsContext.Provider value={[settings, setSettings]}>
