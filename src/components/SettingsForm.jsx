@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
@@ -6,49 +6,86 @@ import playAlarm from "../utils/playAlarm";
 import { defaultSettings, useSettings } from "../context/SettingsContext";
 
 export default function SettingsForm({ handleClose }) {
-  const [globalSettings, setGlobalSettings] = useSettings();
-  const [settings, setSettings] = useState(globalSettings);
+  const [settings, setSettings] = useSettings();
+
+  const [alarmSoundFilename, setAlarmSoundFilename] = useState(
+    settings.alarmSoundFilename
+  );
+  const [alarmVolume, setAlarmVolume] = useState(settings.alarmVolume);
+  const [pomodoro, setPomodoro] = useState(settings.timers.pomodoro);
+  const [shortBreak, setShortBreak] = useState(settings.timers.shortBreak);
+  const [longBreak, setLongBreak] = useState(settings.timers.longBreak);
 
   function handleSubmit(e) {
     e.preventDefault();
-    setGlobalSettings(settings);
+    setSettings({
+      alarmSoundFilename,
+      alarmVolume,
+      timers: {
+        pomodoro,
+        shortBreak,
+        longBreak,
+      },
+    });
     handleClose();
+  }
+
+  const soundRef = useRef(null);
+  const volumeRef = useRef(null);
+
+  function handleSelect(setValue) {
+    return (e) => setValue(e.target.value);
+  }
+
+  function handleNumber(setValue) {
+    return (e) => setValue(e.target.valueAsNumber);
+  }
+
+  function resetForm() {
+    setAlarmSoundFilename(defaultSettings.alarmSoundFilename);
+    setAlarmVolume(defaultSettings.alarmVolume);
+    soundRef.current.setAttribute("selected", "");
+    volumeRef.current.setAttribute("selected", "");
+
+    setPomodoro(defaultSettings.timers.pomodoro);
+    setShortBreak(defaultSettings.timers.shortBreak);
+    setLongBreak(defaultSettings.timers.longBreak);
   }
 
   return (
     <Form onSubmit={handleSubmit}>
-      <fieldset>
+      {/* <fieldset>
         <legend className="h2">User preferences</legend>
         <Form.Check
           className="mb-3"
           label="Timer indication in title?"
-          checked={settings.timerInTitle}
+          checked={formState.timerInTitle}
           onChange={(e) =>
-            setSettings((prevSettings) => ({
-              ...prevSettings,
-              timerInTitle: !prevSettings.timerInTitle,
+            setFormState((prevFormState) => ({
+              ...prevFormState,
+              timerInTitle: !prevFormState.timerInTitle,
             }))
           }
         />
         <Form.Check
           className="mb-3"
           label="Browser notifications?"
-          checked={settings.allowNotifications}
+          checked={formState.allowNotifications}
           onChange={(e) =>
-            setSettings((prevSettings) => ({
-              ...prevSettings,
-              allowNotifications: !prevSettings.allowNotifications,
+            setFormState((prevFormState) => ({
+              ...prevFormState,
+              allowNotifications: !prevFormState.allowNotifications,
             }))
           }
         />
         <Form.Check
           className="mb-3"
           label="Auto start pomodoros and breaks?"
-          checked={settings.autoStart}
+          checked={formState.autoStart}
           onChange={(e) =>
-            setSettings((prevSettings) => ({
-              ...prevSettings,
-              autoStart: !prevSettings.autoStart,
+            setFormState((prevFormState) => ({
+              ...prevFormState,
+              autoStart: !prevFormState.autoStart,
             }))
           }
         />
@@ -59,33 +96,30 @@ export default function SettingsForm({ handleClose }) {
             className="ms-2"
             type="number"
             min={1}
-            value={settings.pomodoroGoal}
+            value={formState.pomodoroGoal}
             onChange={(e) =>
-              setSettings((prevSettings) => ({
-                ...prevSettings,
+              setFormState((prevFormState) => ({
+                ...prevFormState,
                 pomodoroGoal: e.target.value,
               }))
             }
             style={{ width: 60 }}
           />
         </div>
-      </fieldset>
+      </fieldset> */}
       <Form.Group className="mb-3" controlId="sound-select">
         <Form.Label className="h2">Select Sound</Form.Label>
         <Form.Select
           aria-label="Alert Sound"
           htmlSize={5}
-          value={settings.alarmSoundFilename}
-          onChange={(e) =>
-            setSettings((prevSettings) => ({
-              ...prevSettings,
-              alarmSoundFilename: e.target.value,
-            }))
-          }
+          value={alarmSoundFilename}
+          onChange={handleSelect(setAlarmSoundFilename)}
         >
           <option value="80sAlarm.mp3">80s Alarm</option>
           <option value="alarmclock.mp3">Alarm Clock</option>
-          <option value="alarmwatch.mp3">Wristwatch Alarm</option>
+          <option value="alarmwatch.mp3" ref={soundRef}>
+            Wristwatch Alarm
+          </option>
           <option value="ding.mp3">Elevator Ding</option>
           <option value="doorbell.mp3">Door Bell</option>
         </Form.Select>
@@ -95,17 +129,14 @@ export default function SettingsForm({ handleClose }) {
         <Form.Select
           aria-label="Alert Volume"
           htmlSize={5}
-          value={settings.alarmVolume}
-          onChange={(e) =>
-            setSettings((prevSettings) => ({
-              ...prevSettings,
-              alarmVolume: e.target.value,
-            }))
-          }
+          value={alarmVolume}
+          onChange={handleSelect(setAlarmVolume)}
         >
           <option value={0}>Mute</option>
           <option value={0.25}>25%</option>
-          <option value={0.5}>50%</option>
+          <option value={0.5} ref={volumeRef}>
+            50%
+          </option>
           <option value={0.75}>75%</option>
           <option value={1}>100%</option>
         </Form.Select>
@@ -120,13 +151,8 @@ export default function SettingsForm({ handleClose }) {
             <Form.Control
               type="number"
               min={1}
-              value={settings.pomodoroMinutes}
-              onChange={(e) =>
-                setSettings((prevSettings) => ({
-                  ...prevSettings,
-                  pomodoroMinutes: e.target.value,
-                }))
-              }
+              value={pomodoro}
+              onChange={handleNumber(setPomodoro)}
             />
           </Form.Group>
           <Form.Group>
@@ -134,13 +160,8 @@ export default function SettingsForm({ handleClose }) {
             <Form.Control
               type="number"
               min={1}
-              value={settings.shortBreakMinutes}
-              onChange={(e) =>
-                setSettings((prevSettings) => ({
-                  ...prevSettings,
-                  shortBreakMinutes: e.target.value,
-                }))
-              }
+              value={shortBreak}
+              onChange={handleNumber(setShortBreak)}
             />
           </Form.Group>
           <Form.Group>
@@ -148,13 +169,8 @@ export default function SettingsForm({ handleClose }) {
             <Form.Control
               type="number"
               min={1}
-              value={settings.longBreakMinutes}
-              onChange={(e) =>
-                setSettings((prevSettings) => ({
-                  ...prevSettings,
-                  longBreakMinutes: e.target.value,
-                }))
-              }
+              value={longBreak}
+              onChange={handleNumber(setLongBreak)}
             />
           </Form.Group>
         </div>
@@ -163,18 +179,12 @@ export default function SettingsForm({ handleClose }) {
         <Button type="submit" variant="primary">
           Save
         </Button>
-        <Button
-          type="reset"
-          variant="primary"
-          onClick={() => setSettings(defaultSettings)}
-        >
+        <Button type="reset" variant="primary" onClick={resetForm}>
           Reset
         </Button>
         <Button
           variant="primary"
-          onClick={() =>
-            playAlarm(settings.alarmSoundFilename, settings.alarmVolume)
-          }
+          onClick={() => playAlarm(alarmSoundFilename, alarmVolume)}
         >
           Sound Test
         </Button>

@@ -22,7 +22,13 @@ export default function FAQModal() {
           <Button className="mb-3" variant="primary">
             Clear pomodoros done today
           </Button>
-          <p>Pomodoro goal tracker:</p>
+          <div className="d-flex mb-3">
+            <span>Pomodoro goal tracker:</span>
+            <div className="d-flex align-items-center ms-2 gap-2">
+              <span className="circle"></span>
+              <span className="circle circle--active"></span>
+            </div>
+          </div>
           <Table striped bordered>
             <thead>
               <tr>

@@ -1,1 +1,14 @@
 @import "~bootstrap/scss/bootstrap";
+
+.circle {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: solid 2px green;
+  border-radius: 50%;
+}
+
+.circle--active {
+  background-color: green;
+}

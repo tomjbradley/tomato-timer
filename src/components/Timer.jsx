@@ -1,79 +1,61 @@
-import React, { useState, useRef, useEffect } from "react";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Button from "react-bootstrap/Button";
+import React, { useEffect, useRef, useState } from "react";
 
-import formatTime from "../utils/formatTime";
+import TimerDisplay from "./TimerDisplay";
 import TimerControls from "./TimerControls";
-import { useSettings } from "../context/SettingsContext";
+import TimerSelect from "./TimerSelect";
 import playAlarm from "../utils/playAlarm";
 import notify from "../utils/notify";
+import { useSettings } from "../context/SettingsContext";
 
 export default function Timer() {
-  const [
-    {
-      pomodoroMinutes,
-      shortBreakMinutes,
-      longBreakMinutes,
-      alarmSoundFilename,
-      alarmVolume,
-    },
-    setSettings,
-  ] = useSettings();
-  const [seconds, setSeconds] = useState(60 * pomodoroMinutes);
+  const [settings, _] = useSettings();
+  const [activeTimer, setActiveTimer] = useState("pomodoro");
+  const [seconds, setSeconds] = useState(settings.timers[activeTimer] * 60);
   const [running, setRunning] = useState(false);
+  const intervalRef = useRef();
 
-  const intervalId = useRef(null);
+  function changeTimer(timer) {
+    setActiveTimer(timer);
+    setSeconds(settings.timers[timer] * 60);
+    startTimer();
+  }
 
   useEffect(() => {
     resetTimer();
-  }, [pomodoroMinutes, shortBreakMinutes, longBreakMinutes]);
+  }, [settings.timers]);
 
   function startTimer() {
     if (!running) {
       setRunning(true);
-      intervalId.current = setInterval(
-        () =>
-          setSeconds((prevSeconds) => {
-            if (prevSeconds - 1 === 0) ringAlarm();
-            return prevSeconds - 1;
-          }),
-        1000
-      );
+      intervalRef.current = setInterval(() => {
+        setSeconds((prevSeconds) => {
+          if (prevSeconds - 1 === 0) {
+            stopTimer();
+            playAlarm(settings.alarmSoundFilename, settings.alarmVolume);
+            notify();
+            return 0;
+          }
+
+          return prevSeconds - 1;
+        });
+      }, 1000);
     }
   }
 
-  function ringAlarm() {
-    stopTimer();
-    playAlarm(alarmSoundFilename, alarmVolume);
-    notify();
-  }
-
   function stopTimer() {
-    clearInterval(intervalId.current);
     setRunning(false);
+    clearInterval(intervalRef.current);
   }
 
   function resetTimer() {
     stopTimer();
-    setSeconds(pomodoroMinutes * 60);
+    setSeconds(settings.timers[activeTimer] * 60);
   }
 
   return (
     <>
-      <ButtonGroup
-        aria-label="Select Timer"
-        className="d-flex mx-auto my-4"
-        style={{ maxWidth: 748 }}
-      >
-        <Button variant="primary" active>
-          Pomodoro
-        </Button>
-        <Button variant="primary">Short Break</Button>
-        <Button variant="primary">Long Break</Button>
-      </ButtonGroup>
-      <span className="d-block display-1 fw-bold text-center mt-4 mb-5">
-        {formatTime(seconds)}
-      </span>
+      <TimerSelect activeTimer={activeTimer} setActiveTimer={changeTimer} />
+      <TimerDisplay seconds={seconds} />
       <TimerControls
         startTimer={startTimer}
         stopTimer={stopTimer}
