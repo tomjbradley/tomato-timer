@@ -19,7 +19,7 @@ export default function Header() {
             <FAQModal />
             <SettingsModal />
             <Nav.Link
-              href="https://twitter.com/intent/tweet?hashtags=pomodoro,productivity&related=tomatotimer&text=Tomato+Timer:+An+easy+to+use+Pomodoro+Technique+Timer&tw_p=tweetbutton&url=https://tomjbradley.github.io/tomato-timer/&via=tomjbrad"
+              href="https://twitter.com/intent/tweet?hashtags=pomodoro,productivity&related=tomatotimer&text=Tomato+Timer:+An+easy+to+use+Pomodoro+Technique+Timer&tw_p=tweetbutton&url=https://tomjbradley.github.io/tomato-timer&via=tomjbrad"
               target="_blank"
               rel="noreferrer"
             >
