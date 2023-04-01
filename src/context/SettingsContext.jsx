@@ -3,6 +3,8 @@ import React, { useContext } from "react";
 import useLocalStorage from "../hooks/useLocalStorage";
 
 export const defaultSettings = {
+  timerInTitle: true,
+  allowNotifications: true,
   alarmSoundFilename: "alarmwatch.mp3",
   alarmVolume: 0.5,
   timers: {

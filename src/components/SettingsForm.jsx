@@ -8,6 +8,10 @@ import { defaultSettings, useSettings } from "../context/SettingsContext";
 export default function SettingsForm({ handleClose }) {
   const [settings, setSettings] = useSettings();
 
+  const [timerInTitle, setTimerInTitle] = useState(settings.timerInTitle);
+  const [allowNotifications, setAllowNotifications] = useState(
+    settings.allowNotifications
+  );
   const [alarmSoundFilename, setAlarmSoundFilename] = useState(
     settings.alarmSoundFilename
   );
@@ -19,6 +23,8 @@ export default function SettingsForm({ handleClose }) {
   function handleSubmit(e) {
     e.preventDefault();
     setSettings({
+      timerInTitle,
+      allowNotifications,
       alarmSoundFilename,
       alarmVolume,
       timers: {
@@ -27,21 +33,37 @@ export default function SettingsForm({ handleClose }) {
         longBreak,
       },
     });
+    if (timerInTitle === false)
+      document.title = "Tomato Timer - Online Pomodoro Timer App";
     handleClose();
   }
 
   const soundRef = useRef(null);
   const volumeRef = useRef(null);
+  const timerInTitleRef = useRef(null);
+  const allowNotificationsRef = useRef(null);
 
-  function handleSelect(setValue) {
+  function handleChangeSelect(setValue) {
     return (e) => setValue(e.target.value);
   }
 
-  function handleNumber(setValue) {
+  function handleToggle(setValue) {
+    return (e) => setValue((prevValue) => !prevValue);
+  }
+
+  function handleChangeNumber(setValue) {
     return (e) => setValue(e.target.valueAsNumber);
   }
 
   function resetForm() {
+    setTimerInTitle(defaultSettings.timerInTitle);
+    setAllowNotifications(defaultSettings.allowNotifications);
+
+    if (defaultSettings.timerInTitle === true)
+      timerInTitleRef.current.setAttribute("checked", "");
+    if (defaultSettings.allowNotifications === true)
+      allowNotificationsRef.current.setAttribute("checked", "");
+
     setAlarmSoundFilename(defaultSettings.alarmSoundFilename);
     setAlarmVolume(defaultSettings.alarmVolume);
     soundRef.current.setAttribute("selected", "");
@@ -54,31 +76,35 @@ export default function SettingsForm({ handleClose }) {
 
   return (
     <Form onSubmit={handleSubmit}>
-      {/* <fieldset>
+      <fieldset className="mb-3">
         <legend className="h2">User preferences</legend>
-        <Form.Check
-          className="mb-3"
-          label="Timer indication in title?"
-          checked={formState.timerInTitle}
-          onChange={(e) =>
-            setFormState((prevFormState) => ({
-              ...prevFormState,
-              timerInTitle: !prevFormState.timerInTitle,
-            }))
-          }
-        />
-        <Form.Check
-          className="mb-3"
-          label="Browser notifications?"
-          checked={formState.allowNotifications}
-          onChange={(e) =>
-            setFormState((prevFormState) => ({
-              ...prevFormState,
-              allowNotifications: !prevFormState.allowNotifications,
-            }))
-          }
-        />
-        <Form.Check
+        <div className="form-check">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            checked={timerInTitle}
+            onChange={handleToggle(setTimerInTitle)}
+            ref={timerInTitleRef}
+            id="timerInTitleCheck"
+          />
+          <label className="form-check-label" htmlFor="timerInTitleCheck">
+            Timer indication in title?
+          </label>
+        </div>
+        <div className="form-check">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            checked={allowNotifications}
+            onChange={handleToggle(setAllowNotifications)}
+            ref={allowNotificationsRef}
+            id="allowNotificationsCheck"
+          />
+          <label className="form-check-label" htmlFor="allowNotificationsCheck">
+            Browser notifications?
+          </label>
+        </div>
+        {/* <Form.Check
           className="mb-3"
           label="Auto start pomodoros and breaks?"
           checked={formState.autoStart}
@@ -105,15 +131,15 @@ export default function SettingsForm({ handleClose }) {
             }
             style={{ width: 60 }}
           />
-        </div>
-      </fieldset> */}
+        </div> */}
+      </fieldset>
       <Form.Group className="mb-3" controlId="sound-select">
         <Form.Label className="h2">Select Sound</Form.Label>
         <Form.Select
           aria-label="Alert Sound"
           htmlSize={5}
           value={alarmSoundFilename}
-          onChange={handleSelect(setAlarmSoundFilename)}
+          onChange={handleChangeSelect(setAlarmSoundFilename)}
         >
           <option value="80sAlarm.mp3">80s Alarm</option>
           <option value="alarmclock.mp3">Alarm Clock</option>
@@ -130,7 +156,7 @@ export default function SettingsForm({ handleClose }) {
           aria-label="Alert Volume"
           htmlSize={5}
           value={alarmVolume}
-          onChange={handleSelect(setAlarmVolume)}
+          onChange={handleChangeSelect(setAlarmVolume)}
         >
           <option value={0}>Mute</option>
           <option value={0.25}>25%</option>
@@ -152,7 +178,7 @@ export default function SettingsForm({ handleClose }) {
               type="number"
               min={1}
               value={pomodoro}
-              onChange={handleNumber(setPomodoro)}
+              onChange={handleChangeNumber(setPomodoro)}
             />
           </Form.Group>
           <Form.Group>
@@ -161,7 +187,7 @@ export default function SettingsForm({ handleClose }) {
               type="number"
               min={1}
               value={shortBreak}
-              onChange={handleNumber(setShortBreak)}
+              onChange={handleChangeNumber(setShortBreak)}
             />
           </Form.Group>
           <Form.Group>
@@ -170,7 +196,7 @@ export default function SettingsForm({ handleClose }) {
               type="number"
               min={1}
               value={longBreak}
-              onChange={handleNumber(setLongBreak)}
+              onChange={handleChangeNumber(setLongBreak)}
             />
           </Form.Group>
         </div>
