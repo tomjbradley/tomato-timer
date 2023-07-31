@@ -1,0 +1,133 @@
+:root {
+  --clr-primary: DeepSkyBlue;
+  --clr-danger: crimson;
+  --clr-success: SpringGreen;
+  --clr-light: GhostWhite;
+  --clr-dark: DarkSlateGrey;
+}
+
+/* Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+main {
+  padding: 10vh 0;
+}
+
+menu {
+  list-style: none;
+}
+
+ul {
+  list-style-position: inside;
+}
+
+kbd {
+  all: unset;
+  font-weight: 700;
+}
+
+/* Features */
+.site-header,
+.site-footer {
+  padding: 1em 0;
+  background-color: var(--clr-light);
+}
+
+@media (width > 720px) {
+  .site-header__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+#timer {
+  display: block;
+  margin: 5vh 0;
+  font-size: 4em;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Components */
+.button {
+  display: inline-block;
+  padding: 0.5em 1em;
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover,
+.button:focus,
+.active {
+  filter: brightness(90%);
+}
+
+.button--primary {
+  background-color: var(--clr-primary);
+}
+
+.button--success {
+  background-color: var(--clr-success);
+}
+
+.button--danger {
+  background-color: var(--clr-danger);
+}
+
+.button--light {
+  background-color: var(--clr-light);
+}
+
+.button--dark {
+  background-color: var(--clr-dark);
+  color: white;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5em;
+}
+
+/* Utilities */
+.flow > * + * {
+  margin-top: 1em;
+}
+
+.container {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: 0 1em;
+}
+
+.even-columns {
+  display: grid;
+  gap: 1em;
+}
+
+@media (width > 720px) {
+  .even-columns {
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+}
+
+.justify-center {
+  justify-content: center;
+}

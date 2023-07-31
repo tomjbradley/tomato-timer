@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keyboard Shortcuts</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="main.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <div class="site-header__inner">
+          <h1>TomatoTimer</h1>
+          <menu class="button-group">
+            <li><button class="button button--dark">Log</button></li>
+            <li><button class="button button--dark">FAQ</button></li>
+            <li><button class="button button--dark">Settings</button></li>
+          </menu>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="container">
+        <div id="timer-buttons" class="button-group | justify-center">
+          <button
+            id="pomodoro-button"
+            class="button button--primary"
+            data-value="pomodoro"
+          >
+            Pomodoro
+          </button>
+          <button
+            id="short-break-button"
+            class="button button--primary"
+            data-value="shortBreak"
+          >
+            Short Break
+          </button>
+          <button
+            id="long-break-button"
+            class="button button--primary"
+            data-value="longBreak"
+          >
+            Long Break
+          </button>
+        </div>
+        <span id="timer">25:00</span>
+        <div class="button-group | justify-center">
+          <button id="start-button" class="button button--success">
+            Start
+          </button>
+          <button id="stop-button" class="button button--danger">Stop</button>
+          <button id="reset-button" class="button button-light">Reset</button>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <div class="even-columns">
+          <div class="flow">
+            <h2>Keyboard Shortcuts</h2>
+            <ul>
+              <li><kbd>Space</kbd> Start or Stop the timer</li>
+              <li><kbd>Alt + P</kbd> Pomodoro</li>
+              <li><kbd>Alt + S</kbd> Short Break</li>
+              <li><kbd>Alt + L</kbd> Long Break</li>
+              <li><kbd>Alt + R</kbd> Reset Timer</li>
+            </ul>
+          </div>
+          <div class="flow">
+            <h2>Notifications</h2>
+            <p>You can change the audio tone and volume via Settings</p>
+            <p>
+              Desktop Notifications are currently supported in Chrome, Firefox
+              and Safari
+            </p>
+            <button
+              id="enable-notifications-button"
+              class="button button--primary"
+            >
+              Enable Notifications
+            </button>
+          </div>
+          <div class="flow">
+            <h2>Settings</h2>
+            <p>You can set custom times, audio tone and volume via Settings.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
