@@ -293,6 +293,7 @@ function addSession(session) {
   if (session.type === "pomodoro") activateNextGoalIndicator();
 
   sessions.push(session);
+
   setSessions(sessions);
 }
 
@@ -321,6 +322,15 @@ function clearTodaysSessions() {
   setSessions(sessions);
 }
 
+function getTodaysSessions() {
+  const now = new Date();
+  const todaysSessions = sessions.filter(
+    (session) => session.startTime.getDate() === now.getDate()
+  );
+
+  return todaysSessions;
+}
+
 function setSessionDescription(id, description) {
   const session = sessions.find((session) => {
     return session.id === id;
@@ -341,6 +351,33 @@ function getTodaysPomodoros() {
   return pomodoros;
 }
 
+function getNextTimer() {
+  if (currentTimer !== "pomodoro") {
+    return "pomodoro";
+  } else if (currentTimer) {
+    const todaysSessions = getTodaysSessions().reverse();
+    let pomodorosSinceLongBreak = 0;
+
+    todaysSessions.every((session) => {
+      if (session.type === "pomodoro") {
+        pomodorosSinceLongBreak++;
+      }
+
+      if (session.type === "longBreak") {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    if (pomodorosSinceLongBreak >= 4) {
+      return "longBreak";
+    } else {
+      return "shortBreak";
+    }
+  }
+}
+
 let interval;
 function startTimer() {
   if (!isRunning) {
@@ -359,8 +396,10 @@ function startTimer() {
         triggerNotification();
         playAlarmSound(settings.alarmSoundFilename, settings.alarmVolume);
         addSession(currentSession);
+
+        if (settings.autoStartTimers) changeTimer(getNextTimer());
       }
-    }, 10);
+    }, 1);
   }
 }
 function stopTimer() {
