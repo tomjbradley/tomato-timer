@@ -1,7 +1,7 @@
 :root {
   --clr-primary: DeepSkyBlue;
   --clr-danger: crimson;
-  --clr-success: SpringGreen;
+  --clr-success: MediumSeaGreen;
   --clr-light: GhostWhite;
   --clr-dark: DarkSlateGrey;
 
@@ -202,14 +202,17 @@ kbd {
 
 .button--primary {
   background-color: var(--clr-primary);
+  color: white;
 }
 
 .button--success {
   background-color: var(--clr-success);
+  color: white;
 }
 
 .button--danger {
   background-color: var(--clr-danger);
+  color: white;
 }
 
 .button--light {
