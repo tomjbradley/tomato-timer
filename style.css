@@ -29,11 +29,71 @@ main {
   padding: 10vh 0;
 }
 
+.heading-1,
+.heading-2,
+.heading-3 {
+  font-weight: 700;
+}
+
+h1,
+.heading-1 {
+  font-size: 2em;
+}
+
+h2,
+.heading-2 {
+  font-size: 1.5em;
+}
+
+h3,
+.heading-3 {
+  font-size: 1.125em;
+}
+
 menu {
   list-style: none;
 }
 
-ul {
+textarea {
+  resize: vertical;
+}
+
+fieldset {
+  border: none;
+}
+
+label,
+select {
+  display: block;
+  width: 100%;
+}
+
+option,
+input[type="number"] {
+  padding: 0.5em;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: var(--clr-dark);
+  color: white;
+}
+
+thead {
+  background-color: hsl(0 0% 0% / 0.5);
+}
+
+th {
+  text-align: left;
+}
+
+th,
+td {
+  padding: 0.5em;
+}
+
+ul,
+ol {
   list-style-position: inside;
 }
 
@@ -57,7 +117,7 @@ kbd {
   }
 }
 
-#timer {
+.timer {
   display: block;
   margin: 5vh 0;
   font-size: 4em;
@@ -65,7 +125,59 @@ kbd {
   text-align: center;
 }
 
+.pomodoro-goal-indicators {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1em;
+  margin: calc(2px + 2px);
+}
+
+.pomodoro-goal-indicators > span {
+  content: "";
+  width: 1em;
+  height: 1em;
+  outline: solid 2px var(--clr-success);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.pomodoro-goal-indicators > span.active {
+  background-color: var(--clr-success);
+}
+
 /* Components */
+.modal {
+  margin: auto;
+  width: min(64ch, 100vw - 1em * 2);
+  max-height: 80%;
+  padding: 1em;
+}
+
+.modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+[data-dismiss="modal"] {
+  all: unset;
+  width: 1em;
+  height: 1em;
+  background: transparent url("cross.svg") center/1em auto no-repeat;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+[data-dismiss="modal"]:hover {
+  opacity: 0.8;
+}
+
+.modal__body table {
+  width: 100%;
+}
+
 .button {
   display: inline-block;
   padding: 0.5em 1em;
@@ -126,6 +238,11 @@ kbd {
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
   }
+}
+
+.table-container {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .justify-center {

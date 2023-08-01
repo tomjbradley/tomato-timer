@@ -2,8 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <title>Tomato Timer - Online Pomodoro Timer App</title>
+    <meta
+      name="description"
+      content="Tomato Timer is a flexible and easy-to-use online Pomodoro technique timer. Boost your productivity with Tomato Timer."
+    />
+    <meta
+      name="keywords"
+      content="pomodoro technique, tomato timer, pomodoro timer, online pomodoro timer, software timer, pomodoro software timer, productivity tools, gtd, getting things done, productivity, digital timer, concentration techniques, pomodoro resources, pomodoro software"
+    />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Keyboard Shortcuts</title>
     <link rel="stylesheet" href="style.css" />
     <script defer src="main.js"></script>
   </head>
@@ -13,9 +22,33 @@
         <div class="site-header__inner">
           <h1>TomatoTimer</h1>
           <menu class="button-group">
-            <li><button class="button button--dark">Log</button></li>
-            <li><button class="button button--dark">FAQ</button></li>
-            <li><button class="button button--dark">Settings</button></li>
+            <li>
+              <button
+                class="button button--dark"
+                data-toggle="modal"
+                data-target="log-modal"
+              >
+                Log
+              </button>
+            </li>
+            <li>
+              <button
+                class="button button--dark"
+                data-toggle="modal"
+                data-target="faq-modal"
+              >
+                FAQ
+              </button>
+            </li>
+            <li>
+              <button
+                class="button button--dark"
+                data-toggle="modal"
+                data-target="settings-modal"
+              >
+                Settings
+              </button>
+            </li>
           </menu>
         </div>
       </div>
@@ -45,7 +78,7 @@
             Long Break
           </button>
         </div>
-        <span id="timer">25:00</span>
+        <span id="timer" class="timer">25:00</span>
         <div class="button-group | justify-center">
           <button id="start-button" class="button button--success">
             Start
@@ -83,11 +116,193 @@
             </button>
           </div>
           <div class="flow">
-            <h2>Settings</h2>
-            <p>You can set custom times, audio tone and volume via Settings.</p>
+            <h2>About This Project</h2>
+            <p>
+              This is a clone of <del>tomato-timer.com</del>
+              <ins datetime="2022-04-06"
+                >(now toptal.com/project-managers/tomato-timer)</ins
+              >
+              which I made to practice developing a web application with Vanilla
+              JavaScript.
+            </p>
           </div>
         </div>
       </div>
     </footer>
+    <!-- Log Modal -->
+    <dialog id="log-modal" class="modal">
+      <div class="modal__header">
+        <h2>Log</h2>
+        <button data-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal__body | flow">
+        <div>
+          <span id="pomodoro-goal-label">Pomodoro goal tracker:</span>
+          <div
+            id="pomodoro-goal"
+            class="pomodoro-goal-indicators"
+            aria-labelledby="pomodoro-goal-label"
+          ></div>
+        </div>
+        <button
+          id="clear-todays-sessions-button"
+          class="button button--primary"
+        >
+          Clear pomodoro's done today
+        </button>
+        <div class="table-container">
+          <table id="log-table">
+            <thead>
+              <tr>
+                <th>Session</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button id="clear-log-button" class="button button--primary">
+          Clear timer log
+        </button>
+      </div>
+    </dialog>
+
+    <!-- FAQ Modal -->
+    <dialog id="faq-modal" class="modal">
+      <div class="modal__header">
+        <h2>Frequently Asked Questions (<abbr>FAQ</abbr>)</h2>
+        <button data-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal__body | flow">
+        <h3>What is Pomodoro Technique?</h3>
+        <p>
+          The time management technique created by Francesco Cirillo for a more
+          productive way to work and study. For more information,
+          <a href="https://www.pomodorotechnique.com/" target="_blank"
+            >click here</a
+          >.
+        </p>
+
+        <h3>Can you tell me the story without having to visit the website?</h3>
+        <p>Well, it comprises of the following basic steps:</p>
+        <ol>
+          <li>Decide on the task at hand</li>
+          <li>Set the <b>Pomodoro</b> (timer) to 25 minutes</li>
+          <li>Work on the task until the timer expires; Record with an X</li>
+          <li>Take a <b>Short Break</b> (5 minutes)</li>
+          <li>
+            Every four "<i>pomodoros</i>", take a <b>Long Break</b> (10 minutes)
+          </li>
+        </ol>
+
+        <h3>What is TomatoTimer?</h3>
+        <p>
+          It's an easy to use, flexible Pomodoro Technique timer. This project
+          is a clone of <del>tomato-timer.com</del>
+          <ins datetime="2022-04-06"
+            >(now toptal.com/project-managers/tomato-timer)</ins
+          >
+          and it uses Vanilla JavaScript and HTML5 features like Desktop
+          Notifications, Audio API and Local Storage instead of relying on Adobe
+          Flash and other such technologies.
+        </p>
+
+        <h3>Why use TomatoTimer?</h3>
+        <p>Here's why:</p>
+        <ul>
+          <li>Clean and Crisp interface with a Mobile friendly layout.</li>
+          <li>Ability to Pause or Reset the timer intervals.</li>
+          <li>Audio notifications at the end of a timer period.</li>
+          <li>Desktop notifications.</li>
+          <li>Keyboard shortcuts.</li>
+          <li>Ability to change the alert sound + volume via Settings</li>
+          <li>Custom Timer Intervals</li>
+          <li>A log of your activity.</li>
+        </ul>
+      </div>
+    </dialog>
+
+    <!-- Settings Modal -->
+    <dialog id="settings-modal" class="modal">
+      <div class="modal__header">
+        <h2>Settings</h2>
+        <button data-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal__body">
+        <form id="settings-form" class="flow">
+          <fieldset>
+            <legend class="heading-3">User Preferences</legend>
+            <label for="timer-in-title"
+              ><input id="timer-in-title" type="checkbox" /> Timer indication in
+              title?</label
+            >
+            <label for="browser-notifications"
+              ><input id="browser-notifications" type="checkbox" /> Browser
+              notifications?</label
+            >
+            <label for="auto-start"
+              ><input id="auto-start" type="checkbox" /> Auto start pomodoros
+              and breaks?</label
+            >
+            <label for="pomodoro-goal"
+              >Pomodoro goal for the day:
+              <input id="pomodoro-goal" type="number" value="1"
+            /></label>
+          </fieldset>
+          <fieldset>
+            <legend class="heading-3">Select Sound</legend>
+            <select id="sound-select" size="5">
+              <option value="80sAlarm.mp3">80s Alarm</option>
+              <option value="alarmclock.mp3">Alarm Clock</option>
+              <option value="alarmwatch.mp3">Wristwatch Alarm</option>
+              <option value="ding.mp3">Elevator Ding</option>
+              <option value="doorbell.mp3">Door Bell</option>
+            </select>
+          </fieldset>
+          <fieldset>
+            <legend class="heading-3">Select Volume</legend>
+            <select id="volume-select" size="5">
+              <option value="0">Mute</option>
+              <option value="0.25">25%</option>
+              <option value="0.5">50%</option>
+              <option value="0.75">75%</option>
+              <option value="1">100%</option>
+            </select>
+          </fieldset>
+          <fieldset>
+            <legend class="heading-3">
+              Set Custom Times <small>(in minutes)</small>
+            </legend>
+            <div class="even-columns">
+              <div>
+                <label for="pomodoro">Pomodoro:</label>
+                <input id="pomodoro" type="number" value="25" />
+              </div>
+              <div>
+                <label for="short-break">Short Break:</label>
+                <input id="short-break" type="number" value="5" />
+              </div>
+              <div>
+                <label for="long-breal">Long Break:</label>
+                <input id="long-break" type="number" value="10" />
+              </div>
+            </div>
+          </fieldset>
+          <div class="button-group">
+            <button class="button button--primary" type="submit">Save</button>
+            <button class="button button--primary" type="reset">Reset</button>
+            <button
+              id="sound-test-button"
+              class="button button--primary"
+              type="button"
+            >
+              Sound Test
+            </button>
+          </div>
+        </form>
+      </div>
+    </dialog>
   </body>
 </html>
