@@ -399,7 +399,7 @@ function startTimer() {
 
         if (settings.autoStartTimers) changeTimer(getNextTimer());
       }
-    }, 1);
+    }, 1000);
   }
 }
 function stopTimer() {
