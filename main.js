@@ -53,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
   sessions.forEach((session) => addLogRow(session));
 
   // Load Pomodoro Goal Indicator
-  const { pomodoroGoal } = getSettings();
-  setGoalIndicator(pomodoroGoal);
+  const pomodoroCount = getTodaysPomodoros().length;
+  renderGoalIndicator(settings.pomodoroGoal, pomodoroCount);
 
   // Autofill Form
   settingsFormInputs.forEach((input) => {
@@ -147,7 +147,8 @@ settingsForm.addEventListener("submit", (event) => {
 
   setSettings(settings);
 
-  setGoalIndicator(settings.pomodoroGoal);
+  const pomodoroCount = getTodaysPomodoros().length;
+  renderGoalIndicator(settings.pomodoroGoal, pomodoroCount);
   resetTimer();
 });
 
@@ -180,7 +181,6 @@ function setTimerSeconds(seconds) {
 }
 
 function addLogRow(session) {
-  console.log(session);
   const logTableRow = document.createElement("tr");
   logTableRow.setAttribute("key", session.id);
   logTableRow.innerHTML = `
@@ -197,7 +197,12 @@ function clearLog() {
   logTableBody.innerHTML = "";
 }
 
-function setGoalIndicator(number) {
+function renderGoalIndicator(goal, count) {
+  addGoalIndicators(goal);
+  loop(count, activateNextGoalIndicator);
+}
+
+function addGoalIndicators(number) {
   let goalIndicatorInner = ``;
   loop(number, () => {
     goalIndicatorInner += "<span></span>";
@@ -205,15 +210,15 @@ function setGoalIndicator(number) {
   pomodoroGoal.innerHTML = goalIndicatorInner;
 }
 
-function activateGoalIndicators(number) {
+function activateNextGoalIndicator() {
   const pomodoroGoalIndicators = Array.from(pomodoroGoal.children);
 
-  pomodoroGoalIndicators.every((index, goalIndicator) => {
+  pomodoroGoalIndicators.every((goalIndicator) => {
     if (!goalIndicator.classList.contains("active")) {
       goalIndicator.classList.add("active");
+      return false;
     }
-
-    return index < number ? true : false;
+    return true;
   });
 }
 
@@ -278,13 +283,19 @@ function addSession(session) {
   session.endTime = new Date();
 
   addLogRow(session);
+  if (session.type === "pomodoro") activateNextGoalIndicator();
 
   sessions.push(session);
   setSessions(sessions);
 }
 
 function clearAllSessions() {
+  sessions = [];
+
   clearLog();
+  const pomodoroCount = getTodaysPomodoros().length;
+  renderGoalIndicator(settings.pomodoroGoal, pomodoroCount);
+
   localStorage.removeItem("sessions");
 }
 
@@ -295,6 +306,17 @@ function setSessionDescription(id, description) {
 
   session.description = description;
   setSessions(sessions);
+}
+
+function getTodaysPomodoros() {
+  const now = new Date();
+  const pomodoros = sessions.filter(
+    (session) =>
+      session.type === "pomodoro" &&
+      session.startTime.getDate() === now.getDate()
+  );
+
+  return pomodoros;
 }
 
 let interval;
