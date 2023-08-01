@@ -162,7 +162,9 @@ addGlobalEventListener("#log-table tbody tr textarea", "input", (event) => {
   );
 });
 clearLogButton.addEventListener("click", () => clearAllSessions());
-clearTodaysSessionsButton.addEventListener("click", () => console.log(1));
+clearTodaysSessionsButton.addEventListener("click", () =>
+  clearTodaysSessions()
+);
 
 const volumeSelect = document.getElementById("volume-select");
 const soundSelect = document.getElementById("sound-select");
@@ -191,6 +193,11 @@ function addLogRow(session) {
   `;
 
   logTableBody.append(logTableRow);
+}
+
+function removeLogTableRowById(id) {
+  const logTableRow = logTableBody.querySelector(`tr[key='${id}']`);
+  logTableRow.remove();
 }
 
 function clearLog() {
@@ -293,10 +300,25 @@ function clearAllSessions() {
   sessions = [];
 
   clearLog();
+
   const pomodoroCount = getTodaysPomodoros().length;
   renderGoalIndicator(settings.pomodoroGoal, pomodoroCount);
 
   localStorage.removeItem("sessions");
+}
+
+function clearTodaysSessions() {
+  const todaysSessions = getTodaysPomodoros();
+  todaysSessions.forEach((session) => removeLogTableRowById(session.id));
+
+  sessions = sessions.filter(
+    (session) => !todaysSessions.map(({ id }) => id).includes(session.id)
+  );
+
+  const pomodoroCount = getTodaysPomodoros().length;
+  renderGoalIndicator(settings.pomodoroGoal, pomodoroCount);
+
+  setSessions(sessions);
 }
 
 function setSessionDescription(id, description) {
