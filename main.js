@@ -1,21 +1,30 @@
 // Constants
-const POMODORO = 25 * 60;
-const SHORT_BREAK = 5 * 60;
-const LONG_BREAK = 10 * 60;
+const DEFAULT_TITLE = "Tomato Timer - Online Pomodoro Timer App";
 
-const timerDictionary = {
-  pomodoro: POMODORO,
-  shortBreak: SHORT_BREAK,
-  longBreak: LONG_BREAK,
-};
-
-const defaultSettings = {
-  pomodoroGoal: 5,
+const DEFAULT_SETTINGS = {
+  showTimeInTitle: true,
+  browserNotifications: true,
+  autoStartTimers: false,
+  pomodoroGoal: 1,
+  alarmSoundFilename: "alarmwatch.mp3",
+  alarmVolume: 0.5,
+  pomodoro: 25,
+  shortBreak: 5,
+  longBreak: 10,
 };
 
 // User Interface
 const timer = document.getElementById("timer");
+const settingsForm = document.getElementById("settings-form");
+const settingsFormInputs = settingsForm.querySelectorAll(
+  "input[type='number']"
+);
+const settingsFormCheckboxes = settingsForm.querySelectorAll(
+  "input[type='checkbox']"
+);
+const settingsFormSelects = settingsForm.querySelectorAll("select");
 const logTableBody = document.querySelector("#log-table tbody");
+const pomodoroGoal = document.getElementById("pomodoro-goal");
 
 const timerButtons = Array.from(
   document.getElementById("timer-buttons").children
@@ -24,30 +33,49 @@ const startButton = document.getElementById("start-button");
 const stopButton = document.getElementById("stop-button");
 const resetButton = document.getElementById("reset-button");
 const toggleModalButtons = document.querySelectorAll("[data-toggle='modal']");
-const pomodoroGoal = document.getElementById("pomodoro-goal");
 const clearLogButton = document.getElementById("clear-log-button");
 const clearTodaysSessionsButton = document.getElementById(
   "clear-todays-sessions-button"
 );
 const soundTestButton = document.getElementById("sound-test-button");
-const soundSelect = document.getElementById("sound-select");
-const volumeSelect = document.getElementById("volume-select");
 const enableNotificationsButton = document.getElementById(
   "enable-notifications-button"
 );
 
 document.addEventListener("DOMContentLoaded", () => {
-  const sessions = JSON.parse(localStorage.getItem("sessions")) ?? [];
+  const settings = getSettings();
+
+  // Load Timer
+  setTimer(settings[currentTimer] * 60);
+
+  // Load Sessions
+  const sessions = getSessions();
   sessions.forEach((session) => addLogRow(session));
 
-  const pomodoroGoal = 12 ?? defaultSettings.pomodoroGoal;
-  loop(pomodoroGoal, addGoalIndicator);
-  const todaysDate = new Date().getDate();
-  const todaysPomodoros = sessions.filter(
-    (session) =>
-      !(session.type === pomodoro && session.startTime.getDate() === todaysDate)
-  );
-  loop(todaysPomodoros.length, activateNextGoalIndicator);
+  // Load Pomodoro Goal Indicator
+  const { pomodoroGoal } = getSettings();
+  setGoalIndicator(pomodoroGoal);
+
+  // Autofill Form
+  settingsFormInputs.forEach((input) => {
+    input.defaultValue = DEFAULT_SETTINGS[input.name];
+    input.value = settings[input.name];
+  });
+
+  settingsFormCheckboxes.forEach((checkbox) => {
+    checkbox.defaultChecked = DEFAULT_SETTINGS[checkbox.name];
+    checkbox.checked = settings[checkbox.name];
+  });
+
+  settingsFormSelects.forEach((select) => {
+    const options = select.querySelectorAll(`option`);
+    options.forEach((option) => {
+      if (option.getAttribute("value") === DEFAULT_SETTINGS[select.name]) {
+        option.defaultSelected = true;
+      }
+    });
+    select.value = settings[select.name];
+  });
 });
 
 startButton.addEventListener("click", () => startTimer());
@@ -89,62 +117,104 @@ toggleModalButtons.forEach((toggleButton) => {
       modal.close();
     }
   });
+  modal
+    .querySelector("form[method='dialog']")
+    ?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      modal.close();
+    });
 });
 
-clearLogButton.addEventListener("click", () => clearLog());
-clearTodaysSessionsButton.addEventListener("click", () =>
-  clearTodaysSessions()
-);
+settingsForm.addEventListener("submit", (event) => {
+  const settings = {};
 
-soundTestButton.addEventListener("click", () => triggerSoundTest());
+  settingsFormInputs.forEach((input) => {
+    if (input.type === "number") {
+      return (settings[input.name] = +input.value);
+    }
+    settings[input.name] = input.value;
+  });
+  settingsFormCheckboxes.forEach(
+    (checkbox) => (settings[checkbox.name] = checkbox.checked)
+  );
+  settingsFormSelects.forEach((select) => {
+    if (select.getAttribute("type") === "number") {
+      return (settings[select.name] = +select.value);
+    }
+
+    settings[select.name] = select.value;
+  });
+
+  setSettings(settings);
+
+  setGoalIndicator(settings.pomodoroGoal);
+  resetTimer();
+});
+
+addGlobalEventListener("#log-table tbody tr textarea", "input", (event) => {
+  const logTableRowTextarea = event.target;
+  const logTableRow = getGrandParents(logTableRowTextarea, 2);
+
+  setSessionDescription(
+    parseInt(logTableRow.getAttribute("key")),
+    logTableRowTextarea.value
+  );
+});
+clearLogButton.addEventListener("click", () => clearAllSessions());
+clearTodaysSessionsButton.addEventListener("click", () => console.log(1));
+
+const volumeSelect = document.getElementById("volume-select");
+const soundSelect = document.getElementById("sound-select");
+
+soundTestButton.addEventListener("click", () =>
+  playAlarmSound(soundSelect.value, volumeSelect.value)
+);
 
 enableNotificationsButton.addEventListener("click", () =>
   requestNotificationPermission()
 );
 
 // Rendering Helpers
+function setTimerSeconds(seconds) {
+  timer.textContent = seconds;
+}
+
 function addLogRow(session) {
+  console.log(session);
   const logTableRow = document.createElement("tr");
   logTableRow.setAttribute("key", session.id);
   logTableRow.innerHTML = `
     <td>${session.type}</td>
     <td>${formatDate(session.startTime)}</td>
     <td>${formatDate(session.endTime)}</td>
-    <td><textarea value='${session.description}'></textarea></td>
+    <td><textarea>${session.description}</textarea></td>
   `;
 
   logTableBody.append(logTableRow);
 }
-function addGoalIndicator() {
-  const goalIndicator = document.createElement("span");
-  pomodoroGoal.append(goalIndicator);
+
+function clearLog() {
+  logTableBody.innerHTML = "";
 }
-function activateNextGoalIndicator() {
+
+function setGoalIndicator(number) {
+  let goalIndicatorInner = ``;
+  loop(number, () => {
+    goalIndicatorInner += "<span></span>";
+  });
+  pomodoroGoal.innerHTML = goalIndicatorInner;
+}
+
+function activateGoalIndicators(number) {
   const pomodoroGoalIndicators = Array.from(pomodoroGoal.children);
 
-  pomodoroGoalIndicators.every((goalIndicator) => {
+  pomodoroGoalIndicators.every((index, goalIndicator) => {
     if (!goalIndicator.classList.contains("active")) {
       goalIndicator.classList.add("active");
-      return false;
     }
 
-    return true;
+    return index < number ? true : false;
   });
-}
-function removeLogRow(id) {
-  const logTableRow = document.querySelector(`[key='${id}']`);
-  logTableRow.remove();
-}
-
-// Logic
-let isRunning = false;
-let timerSeconds = 25 * 60;
-let currentTimer = "pomodoro";
-let sessions = JSON.parse(localStorage.getItem("sessions")) ?? [];
-
-function updateTimerSeconds(seconds) {
-  timerSeconds = seconds;
-  timer.textContent = formatTime(seconds);
 }
 
 function formatTime(seconds) {
@@ -156,59 +226,94 @@ function formatTime(seconds) {
   }`;
 }
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "full",
-  timeStyle: "short",
-});
 function formatDate(date) {
+  const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+
   return dateFormatter.format(date);
 }
 
-// Core Functionality
+// Data
+let isRunning = false;
+let settings = getSettings();
+let timerSeconds = settings.pomodoro * 60;
+let currentTimer = "pomodoro";
+let sessions = getSessions();
 let currentSession = {};
-function clearLog() {
-  localStorage.removeItem("sessions");
-  logTableBody.innerHTML = "";
+
+function setTitle(newTitle) {
+  document.title = newTitle;
 }
-function clearTodaysSessions() {
-  const todaysDate = new Date().getDate();
-  const todaysSessions = sessions.filter(
-    (session) => new Date(session.startTime).getDate() === todaysDate
-  );
 
-  todaysSessions.forEach((session) => removeLogRow(session.id));
+function setTimer(seconds) {
+  timerSeconds = seconds;
+  timer.textContent = formatTime(seconds);
+}
 
-  sessions = sessions.filter((session) => todaysSessions.indexOf(session) < 0);
+function getSettings() {
+  return JSON.parse(localStorage.getItem("settings")) ?? DEFAULT_SETTINGS;
+}
+
+function setSettings(newSettings) {
+  settings = newSettings;
+  localStorage.setItem("settings", JSON.stringify(newSettings));
+}
+
+function getSessions() {
+  const sessions = JSON.parse(localStorage.getItem("sessions")) ?? [];
+  sessions.forEach((session) => {
+    session.startTime = new Date(session.startTime);
+    session.endTime = new Date(session.endTime);
+  });
+  return sessions;
+}
+
+function setSessions(sessions) {
   localStorage.setItem("sessions", JSON.stringify(sessions));
 }
+
 function addSession(session) {
-  session.endTime = Date.now();
-  session.description = "";
+  session.endTime = new Date();
 
   addLogRow(session);
-  activateNextGoalIndicator();
 
   sessions.push(session);
-  localStorage.setItem("sessions", JSON.stringify(sessions));
+  setSessions(sessions);
+}
 
-  currentSession = {};
+function clearAllSessions() {
+  clearLog();
+  localStorage.removeItem("sessions");
+}
+
+function setSessionDescription(id, description) {
+  const session = sessions.find((session) => {
+    return session.id === id;
+  });
+
+  session.description = description;
+  setSessions(sessions);
 }
 
 let interval;
 function startTimer() {
   if (!isRunning) {
-    currentSession.id = sessions.length + 1;
-    currentSession.type = currentTimer;
-    currentSession.startTime = Date.now();
+    currentSession = new Session(currentTimer);
 
     isRunning = true;
     interval = setInterval(() => {
-      updateTimerSeconds(timerSeconds - 1);
+      setTimer(timerSeconds - 1);
+
+      if (settings.showTimeInTitle)
+        setTitle(`(${formatTime(timerSeconds)}) TomatoTimer`);
 
       if (timerSeconds <= 0) {
         clearInterval(interval);
+        setTitle("Buzzzzz!");
         triggerNotification();
-        playAlarmSound("alarmwatch.mp3", 0.5);
+        playAlarmSound(settings.alarmSoundFilename, settings.alarmVolume);
         addSession(currentSession);
       }
     }, 10);
@@ -220,15 +325,22 @@ function stopTimer() {
 }
 function resetTimer() {
   stopTimer();
-  updateTimerSeconds(timerDictionary[currentTimer]);
+  setTimer(settings[currentTimer] * 60);
+  setTitle(DEFAULT_TITLE);
 }
 function changeTimer(nextTimer) {
   currentTimer = nextTimer;
   resetTimer();
   startTimer();
 }
-function triggerSoundTest() {
-  playAlarmSound(soundSelect.value, volumeSelect.value);
+
+// Objects
+function Session(type) {
+  this.id = sessions.length + 1;
+  this.type = type;
+  this.startTime = new Date();
+  this.endTime = null;
+  this.description = "";
 }
 
 // Web APIs
@@ -237,7 +349,7 @@ function requestNotificationPermission() {
 }
 
 function triggerNotification() {
-  if (Notification.permission === "granted") {
+  if (Notification.permission === "granted" && settings.browserNotifications) {
     const notification = new Notification("TomatoTimer", {
       icon: "/logo.png",
       body: "Your time is up!!",
@@ -271,4 +383,16 @@ function loop(times, callback) {
   for (let i = 0; i < times; i++) {
     callback();
   }
+}
+
+function addGlobalEventListener(selector, type, callback) {
+  document.addEventListener(type, (event) => {
+    if (event.target.matches(selector)) callback(event);
+  });
+}
+
+function getGrandParents(element, order) {
+  if (order === 0) return element;
+
+  return getGrandParents(element.parentNode, order - 1);
 }

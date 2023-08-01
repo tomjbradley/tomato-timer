@@ -80,11 +80,18 @@
         </div>
         <span id="timer" class="timer">25:00</span>
         <div class="button-group | justify-center">
-          <button id="start-button" class="button button--success">
+          <button
+            id="start-button"
+            class="button button--success button--large"
+          >
             Start
           </button>
-          <button id="stop-button" class="button button--danger">Stop</button>
-          <button id="reset-button" class="button button-light">Reset</button>
+          <button id="stop-button" class="button button--danger button--large">
+            Stop
+          </button>
+          <button id="reset-button" class="button button-light button--large">
+            Reset
+          </button>
         </div>
       </div>
     </main>
@@ -231,29 +238,37 @@
         <button data-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal__body">
-        <form id="settings-form" class="flow">
+        <form id="settings-form" class="flow" method="dialog">
           <fieldset>
             <legend class="heading-3">User Preferences</legend>
             <label for="timer-in-title"
-              ><input id="timer-in-title" type="checkbox" /> Timer indication in
-              title?</label
+              ><input
+                id="timer-in-title"
+                type="checkbox"
+                name="showTimeInTitle"
+              />
+              Timer indication in title?</label
             >
             <label for="browser-notifications"
-              ><input id="browser-notifications" type="checkbox" /> Browser
-              notifications?</label
+              ><input
+                id="browser-notifications"
+                type="checkbox"
+                name="browserNotifications"
+              />
+              Browser notifications?</label
             >
             <label for="auto-start"
-              ><input id="auto-start" type="checkbox" /> Auto start pomodoros
-              and breaks?</label
+              ><input id="auto-start" type="checkbox" name="autoStartTimers" />
+              Auto start pomodoros and breaks?</label
             >
             <label for="pomodoro-goal"
               >Pomodoro goal for the day:
-              <input id="pomodoro-goal" type="number" value="1"
+              <input id="pomodoro-goal" type="number" name="pomodoroGoal"
             /></label>
           </fieldset>
           <fieldset>
             <legend class="heading-3">Select Sound</legend>
-            <select id="sound-select" size="5">
+            <select id="sound-select" name="alarmSoundFilename" size="5">
               <option value="80sAlarm.mp3">80s Alarm</option>
               <option value="alarmclock.mp3">Alarm Clock</option>
               <option value="alarmwatch.mp3">Wristwatch Alarm</option>
@@ -263,7 +278,12 @@
           </fieldset>
           <fieldset>
             <legend class="heading-3">Select Volume</legend>
-            <select id="volume-select" size="5">
+            <select
+              id="volume-select"
+              type="number"
+              name="alarmVolume"
+              size="5"
+            >
               <option value="0">Mute</option>
               <option value="0.25">25%</option>
               <option value="0.5">50%</option>
@@ -278,15 +298,25 @@
             <div class="even-columns">
               <div>
                 <label for="pomodoro">Pomodoro:</label>
-                <input id="pomodoro" type="number" value="25" />
+                <input id="pomodoro" type="number" name="pomodoro" value="25" />
               </div>
               <div>
                 <label for="short-break">Short Break:</label>
-                <input id="short-break" type="number" value="5" />
+                <input
+                  id="short-break"
+                  type="number"
+                  name="shortBreak"
+                  value="5"
+                />
               </div>
               <div>
                 <label for="long-breal">Long Break:</label>
-                <input id="long-break" type="number" value="10" />
+                <input
+                  id="long-break"
+                  type="number"
+                  name="longBreak"
+                  value="10"
+                />
               </div>
             </div>
           </fieldset>

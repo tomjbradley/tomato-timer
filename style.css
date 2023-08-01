@@ -4,6 +4,10 @@
   --clr-success: SpringGreen;
   --clr-light: GhostWhite;
   --clr-dark: DarkSlateGrey;
+
+  --size-small: 0.5em;
+  --size-base: 1em;
+  --size-large: 2em;
 }
 
 /* Base */
@@ -70,7 +74,7 @@ select {
 
 option,
 input[type="number"] {
-  padding: 0.5em;
+  padding: var(--size-small);
 }
 
 table {
@@ -89,7 +93,7 @@ th {
 
 th,
 td {
-  padding: 0.5em;
+  padding: var(--size-small);
 }
 
 ul,
@@ -105,11 +109,11 @@ kbd {
 /* Features */
 .site-header,
 .site-footer {
-  padding: 1em 0;
+  padding: var(--size-base) 0;
   background-color: var(--clr-light);
 }
 
-@media (width > 720px) {
+@media (width > 48em) {
   .site-header__inner {
     display: flex;
     justify-content: space-between;
@@ -126,19 +130,22 @@ kbd {
 }
 
 .pomodoro-goal-indicators {
+  --ring-thickness: 2px;
+  --ring-offset: 2px;
+
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1em;
-  margin: calc(2px + 2px);
+  gap: var(--size-base);
+  margin: calc(var(--ring-thickness) + var(--ring-offset));
 }
 
 .pomodoro-goal-indicators > span {
   content: "";
   width: 1em;
   height: 1em;
-  outline: solid 2px var(--clr-success);
-  outline-offset: 2px;
+  outline: solid var(--ring-thickness) var(--clr-success);
+  outline-offset: var(--ring-offset);
   border-radius: 50%;
 }
 
@@ -148,8 +155,10 @@ kbd {
 
 /* Components */
 .modal {
+  --modal-max-width: 64ch;
+
   margin: auto;
-  width: min(64ch, 100vw - 1em * 2);
+  width: min(var(--modal-max-width), 100vw - var(--size-base) * 2);
   max-height: 80%;
   padding: 1em;
 }
@@ -158,7 +167,7 @@ kbd {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1em;
+  margin-bottom: var(--size-base);
 }
 
 [data-dismiss="modal"] {
@@ -180,7 +189,7 @@ kbd {
 
 .button {
   display: inline-block;
-  padding: 0.5em 1em;
+  padding: var(--size-small) var(--size-base);
   border: none;
   cursor: pointer;
 }
@@ -212,28 +221,37 @@ kbd {
   color: white;
 }
 
+.button--large {
+  padding: var(--size-base) var(--size-large);
+}
+
 .button-group {
+  --button-group-gap: var(--size-small);
+
   display: flex;
-  gap: 0.5em;
+  gap: var(--button-group-gap);
 }
 
 /* Utilities */
 .flow > * + * {
-  margin-top: 1em;
+  margin-top: var(--flow-spacer, 1em);
 }
 
 .container {
-  max-width: 960px;
+  --container-max-width: 960px;
+  --container-padding: var(--size-base);
+
+  max-width: var(--container-max-width);
   margin-inline: auto;
-  padding: 0 1em;
+  padding: 0 var(--container-padding);
 }
 
 .even-columns {
   display: grid;
-  gap: 1em;
+  gap: var(--size-base);
 }
 
-@media (width > 720px) {
+@media (width > 50em) {
   .even-columns {
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
