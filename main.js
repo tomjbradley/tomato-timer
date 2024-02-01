@@ -434,7 +434,7 @@ function requestNotificationPermission() {
 function triggerNotification() {
   if (Notification.permission === "granted" && settings.browserNotifications) {
     const notification = new Notification("TomatoTimer", {
-      icon: "/logo.png",
+      icon: "logo.png",
       body: "Your time is up!!",
     });
 
@@ -443,7 +443,7 @@ function triggerNotification() {
 }
 
 function playAlarmSound(filename, volume) {
-  const audio = new Audio("/assets/audio/" + filename);
+  const audio = new Audio("assets/audio/" + filename);
   audio.volume = volume;
   audio.play();
 }
